@@ -46,7 +46,7 @@
 
    - name: Extract Tomcat archive
 #    shell: /bin/tar xvf /opt/apache-tomcat-8.5.12.tar.gz -C /opt/tomcat/{{ tomcat_version }}
-     unarchive: copy=no src=/opt/apache-tomcat-8.5.12.tar.gz dest=/opt/tomcat creates=/opt/tomcat/8.5.12
+     unarchive: copy=no src=/opt/apache-tomcat-8.5.12.tar.gz dest=/opt/tomcat/ creates=/opt/tomcat/{{ tomcat_version }}
      become: yes
      become_user: root
 
@@ -59,3 +59,24 @@
      file: path=/opt/tomcat/ owner=tomcat_as group=tomcat_as_group state=directory recurse=yes
      become: yes
      become_user: root
+
+   - name: Copy tomcat init file
+     copy: src=~/cm/ansible/day-1/tomcat.sh dest=/etc/init.d/tomcat remote_src=no mode=0755 force=yes
+     become: yes
+     become_user: root
+
+   - name: Start tomcat
+     service: name=tomcat state=started
+     become: yes
+     become_user: root
+
+   - name: Check #1
+     shell: sleep 15; curl -IL localhost:8080
+
+   - name: Checking #2
+     shell: /etc/init.d/tomcat status
+     become: yes
+     become_user: root 
+
+   - name: Checking #3 uptime of Tomcat
+     shell: ps -eo pid,comm,lstart,etime,time,args |grep tomcat
