@@ -1,22 +1,24 @@
-- hosts: appserver
+
+ - hosts: appserver
 #  become: yes
 #  become_user: root
   
    vars:
      tomcat_version: 8.5.12
-     java_version: 
+     java_version: 1.8.0 
      tomcat_root: /opt/tomcat
      tomcat_link: http://ftp.byfly.by/pub/apache.org/tomcat/tomcat-8/v8.5.12/bin/apache-tomcat-8.5.12.tar.gz
 
    tasks:
 
-#  - name: Install Java 1.8
-#    yum: name=java-1.8.0-openjdk state=present
-#    become: yes
-#    become_user: root
-#    register: javainstalled
+   - name: Install Java 1.8
+     yum: name=java-{{ java_version }}-openjdk state=present
+     become: yes
+     become_user: root
+     
+#     register: javainstalled
 
-   - name: add group "tomcat"
+   - name: add group "tomcat_as"
      group: name=tomcat_as_group
      become: yes
      become_user: root
@@ -44,12 +46,12 @@
 
    - name: Extract Tomcat archive
 #    shell: /bin/tar xvf /opt/apache-tomcat-8.5.12.tar.gz -C /opt/tomcat/{{ tomcat_version }}
-     unarchive: copy=no src=/opt/apache-tomcat-8.5.12.tar.gz dest=/opt/tomcat
+     unarchive: copy=no src=/opt/apache-tomcat-8.5.12.tar.gz dest=/opt/tomcat creates=/opt/tomcat/8.5.12
      become: yes
      become_user: root
 
-   - name: Move to directory
-     command: /bin/mv /opt/tomcat/apache-tomcat-8.5.12 /opt/tomcat/{{ tomcat_version }}
+   - name: Rename directory
+     command: /bin/mv /opt/tomcat/apache-tomcat-8.5.12 /opt/tomcat/{{ tomcat_version }} creates=/opt/tomcat/{{ tomcat_version }}
      become: yes
      become_user: root
 
